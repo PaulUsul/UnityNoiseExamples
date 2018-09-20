@@ -1,12 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Mathematics;
+﻿using Unity.Mathematics;
 using UnityEngine;
 
-public class SimplePerlinNoise : MonoBehaviour
+public class SimpleNoise : MonoBehaviour
 {
     [SerializeField]
     private int resolution = 512;
+
+    [SerializeField]
+    private float scale = 8;
+
+
+    private float oldScale;
 
     private Texture2D tex;
 
@@ -23,7 +27,21 @@ public class SimplePerlinNoise : MonoBehaviour
         }
         render.material.mainTexture = tex;
 
-        float scaleAdjust = 1f / resolution;
+        UpdateTexture();
+    }
+
+    private void Update()
+    {
+        if (!Mathf.Approximately(scale, oldScale))
+        {
+            UpdateTexture();
+            oldScale = scale;
+        }
+    }
+
+    private void UpdateTexture()
+    {
+        float scaleAdjust = scale / resolution;
 
         Color[] pixels = new Color[resolution * resolution];
         for (int x = 0; x < resolution; x++)
@@ -33,7 +51,7 @@ public class SimplePerlinNoise : MonoBehaviour
                 float2 rc = noise.cellular(new float2(x, y) * scaleAdjust);
 
                 int index = x + (y * resolution);
-                pixels[index] = new Color(rc.x, rc.y, 1, 1);
+                pixels[index] = new Color(rc.x, rc.y, 0, 1);
             }
         }
 
